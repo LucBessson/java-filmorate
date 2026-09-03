@@ -39,7 +39,7 @@ public class UserController {
         if (!users.containsKey(user.getId())) {
             String message = "Пользователь с id " + user.getId() + " не найден";
             log.error(message);
-            throw new ValidationException(message);
+            throw new RuntimeException(message);
         }
 
         validateUser(user);
