@@ -30,6 +30,7 @@ public class UserService {
     }
 
     public User update(User user) {
+        getUserOrThrow(user.getId());
         setDefaultName(user);
         return userStorage.update(user);
     }
