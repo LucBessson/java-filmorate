@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -24,11 +25,12 @@ public class UserService {
     }
 
     public User create(User user) {
+        setDefaultName(user);
         return userStorage.create(user);
     }
 
     public User update(User user) {
-        getUserOrThrow(user.getId());
+        setDefaultName(user);
         return userStorage.update(user);
     }
 
@@ -41,6 +43,8 @@ public class UserService {
     }
 
     public void addFriend(int userId, int friendId) {
+        validateDifferentUsers(userId, friendId);
+
         User user = getUserOrThrow(userId);
         User friend = getUserOrThrow(friendId);
 
@@ -54,6 +58,8 @@ public class UserService {
     }
 
     public void removeFriend(int userId, int friendId) {
+        validateDifferentUsers(userId, friendId);
+
         User user = getUserOrThrow(userId);
         User friend = getUserOrThrow(friendId);
 
@@ -70,11 +76,13 @@ public class UserService {
         User user = getUserOrThrow(userId);
 
         return user.getFriends().stream()
-                .map(userStorage::getById)
+                .map(this::getUserOrThrow)
                 .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(int userId, int otherId) {
+        validateDifferentUsers(userId, otherId);
+
         User user = getUserOrThrow(userId);
         User otherUser = getUserOrThrow(otherId);
 
@@ -83,17 +91,27 @@ public class UserService {
                 .collect(Collectors.toSet());
 
         return commonFriendIds.stream()
-                .map(userStorage::getById)
+                .map(this::getUserOrThrow)
                 .collect(Collectors.toList());
     }
 
-    private User getUserOrThrow(int id) {
-        User user = userStorage.getById(id);
+    private User getUserOrThrow(int userId) {
+        return userStorage.getById(userId)
+                .orElseThrow(() ->
+                        new NotFoundException(
+                                "Пользователь с id " + userId + " не найден"));
+    }
 
-        if (user == null) {
-            throw new NotFoundException("Пользователь с id " + id + " не найден");
+    private void setDefaultName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
         }
+    }
 
-        return user;
+    private void validateDifferentUsers(int userId, int otherUserId) {
+        if (userId == otherUserId) {
+            throw new ValidationException(
+                    "Пользователь не может выполнить операцию с самим собой");
+        }
     }
 }

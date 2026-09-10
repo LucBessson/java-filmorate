@@ -26,16 +26,12 @@ public class UserController {
     @PostMapping
     public User create(@RequestBody User user) {
         validateUser(user);
-        setDefaultName(user);
-
         return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User user) {
         validateUser(user);
-        setDefaultName(user);
-
         return userService.update(user);
     }
 
@@ -80,11 +76,6 @@ public class UserController {
         return userService.getCommonFriends(id, otherId);
     }
 
-    private void setDefaultName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
 
     private void validateUser(User user) {
 
