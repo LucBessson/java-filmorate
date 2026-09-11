@@ -2,11 +2,14 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryGenreStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryMpaStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.List;
@@ -18,13 +21,25 @@ class FilmServiceTest {
     private FilmService filmService;
     private InMemoryFilmStorage filmStorage;
     private InMemoryUserStorage userStorage;
+    private InMemoryMpaStorage mpaStorage;
+    private InMemoryGenreStorage genreStorage;
+
+
 
     @BeforeEach
     void setUp() {
+
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
+        mpaStorage = new InMemoryMpaStorage();
+        genreStorage = new InMemoryGenreStorage();
 
-        filmService = new FilmService(filmStorage, userStorage);
+        filmService = new FilmService(
+                filmStorage,
+                userStorage,
+                mpaStorage,
+                genreStorage
+        );
     }
 
     private Film createFilm(String name) {
