@@ -1,74 +1,108 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
 
-    private static final LocalDate MINIMUM_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-    private final Map<Integer, Film> films = new HashMap<>();
-    private int nextId = 1;
+    private static final LocalDate MINIMUM_RELEASE_DATE =
+            LocalDate.of(1895, 12, 28);
+
+    private final FilmService filmService;
+
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @PostMapping
     public Film create(@RequestBody Film film) {
         validateFilm(film);
-        film.setId(nextId++);
-        films.put(film.getId(), film);
-        log.info("Добавлен фильм: {}", film);
-        return film;
+
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@RequestBody Film film) {
-        if (!films.containsKey(film.getId())) {
-            String message = "Фильм с id " + film.getId() + " не найден";
-            log.error(message);
-            throw new NotFoundException(message);
-        }
         validateFilm(film);
-        films.put(film.getId(), film);
-        log.info("Обновлён фильм: {}", film);
-        return film;
+
+        return filmService.update(film);
     }
 
     @GetMapping
     public Collection<Film> getAll() {
         log.info("Получен запрос на получение списка фильмов");
-        return films.values();
+
+        return filmService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Film getById(@PathVariable int id) {
+        return filmService.getById(id);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(
+            @PathVariable int id,
+            @PathVariable int userId) {
+
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void removeLike(
+            @PathVariable int id,
+            @PathVariable int userId) {
+
+        filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopular(
+            @RequestParam(defaultValue = "10") int count) {
+
+        return filmService.getPopularFilms(count);
     }
 
     private void validateFilm(Film film) {
+
         if (film.getName() == null || film.getName().isBlank()) {
-            String message = "Название фильма не может быть пустым";
-            throw new ValidationException(message);
+            throw new ValidationException(
+                    "Название фильма не может быть пустым"
+            );
         }
 
         if (film.getDescription() != null
                 && film.getDescription().length() > 200) {
-            String message = "Описание фильма не может превышать 200 символов";
-            throw new ValidationException(message);
+
+            throw new ValidationException(
+                    "Описание фильма не может содержать более 200 символов"
+            );
         }
 
-        if (film.getReleaseDate().isBefore(MINIMUM_RELEASE_DATE)) {
-            String message = "Дата релиза не может быть раньше 28 декабря 1895 года";
-            log.error(message);
-            throw new ValidationException(message);
+        if (film.getReleaseDate() != null
+                && film.getReleaseDate().isBefore(MINIMUM_RELEASE_DATE)) {
+
+            throw new ValidationException(
+                    "Дата релиза не может быть раньше 28 декабря 1895 года"
+            );
         }
 
         if (film.getDuration() <= 0) {
-            String message = "Продолжительность фильма должна быть положительным числом";
-            throw new ValidationException(message);
+            throw new ValidationException(
+                    "Продолжительность фильма должна быть положительной"
+            );
         }
     }
 }
