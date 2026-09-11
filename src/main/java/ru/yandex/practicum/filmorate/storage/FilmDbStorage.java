@@ -111,17 +111,17 @@ public class FilmDbStorage implements FilmStorage {
     public Optional<Film> getById(int id) {
         List<Film> films = jdbcTemplate.query(
                 """
-                SELECT f.id,
-                       f.name,
-                       f.description,
-                       f.release_date,
-                       f.duration,
-                       f.mpa_id,
-                       m.name AS mpa_name
-                FROM films f
-                LEFT JOIN mpa m ON f.mpa_id = m.id
-                WHERE f.id = ?
-                """,
+                        SELECT f.id,
+                               f.name,
+                               f.description,
+                               f.release_date,
+                               f.duration,
+                               f.mpa_id,
+                               m.name AS mpa_name
+                        FROM films f
+                        LEFT JOIN mpa m ON f.mpa_id = m.id
+                        WHERE f.id = ?
+                        """,
                 filmRowMapper(),
                 id
         );
@@ -142,17 +142,17 @@ public class FilmDbStorage implements FilmStorage {
     public Collection<Film> getAll() {
         List<Film> films = jdbcTemplate.query(
                 """
-                SELECT f.id,
-                       f.name,
-                       f.description,
-                       f.release_date,
-                       f.duration,
-                       f.mpa_id,
-                       m.name AS mpa_name
-                FROM films f
-                LEFT JOIN mpa m ON f.mpa_id = m.id
-                ORDER BY f.id
-                """,
+                        SELECT f.id,
+                               f.name,
+                               f.description,
+                               f.release_date,
+                               f.duration,
+                               f.mpa_id,
+                               m.name AS mpa_name
+                        FROM films f
+                        LEFT JOIN mpa m ON f.mpa_id = m.id
+                        ORDER BY f.id
+                        """,
                 filmRowMapper()
         );
 
@@ -176,27 +176,27 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getPopularFilms(int count) {
         List<Film> films = jdbcTemplate.query(
                 """
-                SELECT f.id,
-                       f.name,
-                       f.description,
-                       f.release_date,
-                       f.duration,
-                       f.mpa_id,
-                       m.name AS mpa_name,
-                       COUNT(l.user_id) AS likes_count
-                FROM films f
-                LEFT JOIN mpa m ON f.mpa_id = m.id
-                LEFT JOIN likes l ON f.id = l.film_id
-                GROUP BY f.id,
-                         f.name,
-                         f.description,
-                         f.release_date,
-                         f.duration,
-                         f.mpa_id,
-                         m.name
-                ORDER BY likes_count DESC, f.id
-                LIMIT ?
-                """,
+                        SELECT f.id,
+                               f.name,
+                               f.description,
+                               f.release_date,
+                               f.duration,
+                               f.mpa_id,
+                               m.name AS mpa_name,
+                               COUNT(l.user_id) AS likes_count
+                        FROM films f
+                        LEFT JOIN mpa m ON f.mpa_id = m.id
+                        LEFT JOIN likes l ON f.id = l.film_id
+                        GROUP BY f.id,
+                                 f.name,
+                                 f.description,
+                                 f.release_date,
+                                 f.duration,
+                                 f.mpa_id,
+                                 m.name
+                        ORDER BY likes_count DESC, f.id
+                        LIMIT ?
+                        """,
                 filmRowMapper(),
                 count
         );
@@ -213,10 +213,10 @@ public class FilmDbStorage implements FilmStorage {
     public void addLike(int filmId, int userId) {
         jdbcTemplate.update(
                 """
-                MERGE INTO likes (film_id, user_id)
-                KEY (film_id, user_id)
-                VALUES (?, ?)
-                """,
+                        MERGE INTO likes (film_id, user_id)
+                        KEY (film_id, user_id)
+                        VALUES (?, ?)
+                        """,
                 filmId,
                 userId
         );
@@ -226,10 +226,10 @@ public class FilmDbStorage implements FilmStorage {
     public void removeLike(int filmId, int userId) {
         jdbcTemplate.update(
                 """
-                DELETE FROM likes
-                WHERE film_id = ?
-                  AND user_id = ?
-                """,
+                        DELETE FROM likes
+                        WHERE film_id = ?
+                          AND user_id = ?
+                        """,
                 filmId,
                 userId
         );
@@ -243,9 +243,9 @@ public class FilmDbStorage implements FilmStorage {
         for (Genre genre : film.getGenres()) {
             jdbcTemplate.update(
                     """
-                    INSERT INTO film_genres (film_id, genre_id)
-                    VALUES (?, ?)
-                    """,
+                            INSERT INTO film_genres (film_id, genre_id)
+                            VALUES (?, ?)
+                            """,
                     film.getId(),
                     genre.getId()
             );
@@ -255,12 +255,12 @@ public class FilmDbStorage implements FilmStorage {
     private void loadGenres(Film film) {
         List<Genre> genres = jdbcTemplate.query(
                 """
-                SELECT g.id, g.name
-                FROM genres g
-                JOIN film_genres fg ON fg.genre_id = g.id
-                WHERE fg.film_id = ?
-                ORDER BY g.id
-                """,
+                        SELECT g.id, g.name
+                        FROM genres g
+                        JOIN film_genres fg ON fg.genre_id = g.id
+                        WHERE fg.film_id = ?
+                        ORDER BY g.id
+                        """,
                 (rs, rowNum) ->
                         new Genre(
                                 rs.getInt("id"),
@@ -275,10 +275,10 @@ public class FilmDbStorage implements FilmStorage {
     private void loadLikes(Film film) {
         List<Integer> likes = jdbcTemplate.query(
                 """
-                SELECT user_id
-                FROM likes
-                WHERE film_id = ?
-                """,
+                        SELECT user_id
+                        FROM likes
+                        WHERE film_id = ?
+                        """,
                 (rs, rowNum) -> rs.getInt("user_id"),
                 film.getId()
         );

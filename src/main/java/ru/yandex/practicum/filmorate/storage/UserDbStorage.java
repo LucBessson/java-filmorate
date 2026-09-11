@@ -70,13 +70,13 @@ public class UserDbStorage implements UserStorage {
     public User update(User user) {
         jdbcTemplate.update(
                 """
-                UPDATE users
-                SET email = ?,
-                    login = ?,
-                    name = ?,
-                    birthday = ?
-                WHERE id = ?
-                """,
+                        UPDATE users
+                        SET email = ?,
+                            login = ?,
+                            name = ?,
+                            birthday = ?
+                        WHERE id = ?
+                        """,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
@@ -93,14 +93,14 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> getById(int id) {
         List<User> users = jdbcTemplate.query(
                 """
-                SELECT id,
-                       email,
-                       login,
-                       name,
-                       birthday
-                FROM users
-                WHERE id = ?
-                """,
+                        SELECT id,
+                               email,
+                               login,
+                               name,
+                               birthday
+                        FROM users
+                        WHERE id = ?
+                        """,
                 userRowMapper(),
                 id
         );
@@ -120,14 +120,14 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> getAll() {
         List<User> users = jdbcTemplate.query(
                 """
-                SELECT id,
-                       email,
-                       login,
-                       name,
-                       birthday
-                FROM users
-                ORDER BY id
-                """,
+                        SELECT id,
+                               email,
+                               login,
+                               name,
+                               birthday
+                        FROM users
+                        ORDER BY id
+                        """,
                 userRowMapper()
         );
 
@@ -150,10 +150,10 @@ public class UserDbStorage implements UserStorage {
     public void addFriend(int userId, int friendId) {
         jdbcTemplate.update(
                 """
-                MERGE INTO friendships (user_id, friend_id)
-                KEY (user_id, friend_id)
-                VALUES (?, ?)
-                """,
+                        MERGE INTO friendships (user_id, friend_id)
+                        KEY (user_id, friend_id)
+                        VALUES (?, ?)
+                        """,
                 userId,
                 friendId
         );
@@ -163,10 +163,10 @@ public class UserDbStorage implements UserStorage {
     public void removeFriend(int userId, int friendId) {
         jdbcTemplate.update(
                 """
-                DELETE FROM friendships
-                WHERE user_id = ?
-                  AND friend_id = ?
-                """,
+                        DELETE FROM friendships
+                        WHERE user_id = ?
+                          AND friend_id = ?
+                        """,
                 userId,
                 friendId
         );
@@ -176,11 +176,11 @@ public class UserDbStorage implements UserStorage {
     public List<Integer> getFriends(int userId) {
         return jdbcTemplate.query(
                 """
-                SELECT friend_id
-                FROM friendships
-                WHERE user_id = ?
-                ORDER BY friend_id
-                """,
+                        SELECT friend_id
+                        FROM friendships
+                        WHERE user_id = ?
+                        ORDER BY friend_id
+                        """,
                 (rs, rowNum) -> rs.getInt("friend_id"),
                 userId
         );
@@ -190,14 +190,14 @@ public class UserDbStorage implements UserStorage {
     public List<Integer> getCommonFriends(int userId, int otherUserId) {
         return jdbcTemplate.query(
                 """
-                SELECT f1.friend_id
-                FROM friendships f1
-                JOIN friendships f2
-                  ON f1.friend_id = f2.friend_id
-                WHERE f1.user_id = ?
-                  AND f2.user_id = ?
-                ORDER BY f1.friend_id
-                """,
+                        SELECT f1.friend_id
+                        FROM friendships f1
+                        JOIN friendships f2
+                          ON f1.friend_id = f2.friend_id
+                        WHERE f1.user_id = ?
+                          AND f2.user_id = ?
+                        ORDER BY f1.friend_id
+                        """,
                 (rs, rowNum) -> rs.getInt("friend_id"),
                 userId,
                 otherUserId

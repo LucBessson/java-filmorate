@@ -20,10 +20,10 @@ public class GenreDbStorage implements GenreStorage {
     public Collection<Genre> getAll() {
         return jdbcTemplate.query(
                 """
-                SELECT id, name
-                FROM genres
-                ORDER BY id
-                """,
+                        SELECT id, name
+                        FROM genres
+                        ORDER BY id
+                        """,
                 genreRowMapper()
         );
     }
@@ -32,10 +32,10 @@ public class GenreDbStorage implements GenreStorage {
     public Optional<Genre> getById(int id) {
         List<Genre> genres = jdbcTemplate.query(
                 """
-                SELECT id, name
-                FROM genres
-                WHERE id = ?
-                """,
+                        SELECT id, name
+                        FROM genres
+                        WHERE id = ?
+                        """,
                 genreRowMapper(),
                 id
         );

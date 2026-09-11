@@ -20,10 +20,10 @@ public class MpaDbStorage implements MpaStorage {
     public Collection<Mpa> getAll() {
         return jdbcTemplate.query(
                 """
-                SELECT id, name
-                FROM mpa
-                ORDER BY id
-                """,
+                        SELECT id, name
+                        FROM mpa
+                        ORDER BY id
+                        """,
                 mpaRowMapper()
         );
     }
@@ -32,10 +32,10 @@ public class MpaDbStorage implements MpaStorage {
     public Optional<Mpa> getById(int id) {
         List<Mpa> ratings = jdbcTemplate.query(
                 """
-                SELECT id, name
-                FROM mpa
-                WHERE id = ?
-                """,
+                        SELECT id, name
+                        FROM mpa
+                        WHERE id = ?
+                        """,
                 mpaRowMapper(),
                 id
         );
