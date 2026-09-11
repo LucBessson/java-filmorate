@@ -30,7 +30,7 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldAddFriendMutually() {
+    void shouldAddFriend() {
         User user1 = createUser("user1");
         User user2 = createUser("user2");
 
@@ -40,7 +40,7 @@ class UserServiceTest {
         User result2 = userService.getById(user2.getId());
 
         assertTrue(result1.getFriends().contains(user2.getId()));
-        assertTrue(result2.getFriends().contains(user1.getId()));
+        assertFalse(result2.getFriends().contains(user1.getId()));
     }
 
     @Test
