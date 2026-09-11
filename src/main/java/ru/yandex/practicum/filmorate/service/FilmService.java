@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -21,7 +22,10 @@ public class FilmService {
     private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(
+            @Qualifier("filmDbStorage") FilmStorage filmStorage,
+            @Qualifier("userDbStorage") UserStorage userStorage) {
+
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -44,19 +48,17 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        Film film = getFilmOrThrow(filmId);
+        getFilmOrThrow(filmId);
         getUserOrThrow(userId);
 
-        film.getLikes().add(userId);
-        filmStorage.update(film);
+        filmStorage.addLike(filmId, userId);
     }
 
     public void removeLike(int filmId, int userId) {
-        Film film = getFilmOrThrow(filmId);
+        getFilmOrThrow(filmId);
         getUserOrThrow(userId);
 
-        film.getLikes().remove(userId);
-        filmStorage.update(film);
+        filmStorage.removeLike(filmId, userId);
     }
 
     public List<Film> getPopularFilms(int count) {
