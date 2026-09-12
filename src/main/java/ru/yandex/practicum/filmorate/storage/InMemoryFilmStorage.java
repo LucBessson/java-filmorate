@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 
-@Component
+@Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
@@ -48,5 +48,23 @@ public class InMemoryFilmStorage implements FilmStorage {
                         .reversed())
                 .limit(count)
                 .toList();
+    }
+
+    @Override
+    public void addLike(int filmId, int userId) {
+        Film film = films.get(filmId);
+
+        if (film != null) {
+            film.getLikes().add(userId);
+        }
+    }
+
+    @Override
+    public void removeLike(int filmId, int userId) {
+        Film film = films.get(filmId);
+
+        if (film != null) {
+            film.getLikes().remove(userId);
+        }
     }
 }

@@ -38,7 +38,6 @@ public class UserController {
     @GetMapping
     public Collection<User> getAll() {
         log.info("Получен запрос на получение списка пользователей");
-
         return userService.getAll();
     }
 
@@ -75,7 +74,6 @@ public class UserController {
 
         return userService.getCommonFriends(id, otherId);
     }
-
 
     private void validateUser(User user) {
 
